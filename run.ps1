@@ -7,4 +7,5 @@ Start-Sleep -Seconds 1
 $wshell = New-Object -ComObject wscript.shell
 $wshell.AppActivate("Unbenannt - Editor")
 Start-Sleep -Milliseconds 500
-$wshell.SendKeys("412")
+$wshell.SendKeys("412") | Out-Null
+

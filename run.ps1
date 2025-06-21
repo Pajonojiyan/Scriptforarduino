@@ -11,23 +11,31 @@ $ExeTargetPath = Join-Path $Documents $ExeName
 if (Test-Path $ZipPath) {
     Write-Host "[+] ZIP-Datei gefunden: $ZipPath"
 
-    # Schritt 2: Entpacken mit Expand-Archive
+    # Schritt 2: Entpacken
     if (-Not (Test-Path $ExtractPath)) {
         New-Item -ItemType Directory -Path $ExtractPath | Out-Null
     }
     Expand-Archive -Path $ZipPath -DestinationPath $ExtractPath -Force
     Write-Host "[+] ZIP-Datei entpackt nach: $ExtractPath"
 
-    # Schritt 3: Prüfen, ob Registry.exe existiert
+    # Schritt 3: Registry.exe finden
     if (Test-Path $ExeSourcePath) {
         Write-Host "[+] Registry.exe gefunden: $ExeSourcePath"
 
-        # Schritt 4: Datei nach Dokumente kopieren
+        # Schritt 4: Nach Dokumente kopieren
         Copy-Item -Path $ExeSourcePath -Destination $ExeTargetPath -Force
         Write-Host "[+] Registry.exe wurde nach '$Documents' kopiert."
+
+        # Schritt 5: ZIP-Datei löschen
+        Remove-Item -Path $ZipPath -Force
+        Write-Host "[+] Registry.zip gelöscht."
+
+        # Schritt 6: Ordner "Registry" löschen
+        Remove-Item -Path $ExtractPath -Recurse -Force
+        Write-Host "[+] Ordner 'Registry' gelöscht."
     } else {
-        Write-Host "[-] Registry.exe wurde im entpackten Ordner nicht gefunden."
+        Write-Host "[-] Registry.exe nicht im entpackten Ordner gefunden."
     }
 } else {
-    Write-Host "[-] Registry.zip wurde nicht im Downloads-Ordner gefunden."
+    Write-Host "[-] Registry.zip nicht im Downloads-Ordner gefunden."
 }

